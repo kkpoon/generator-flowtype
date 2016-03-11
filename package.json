@@ -1,6 +1,6 @@
 {
   "name": "generator-flowtype",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "make project flowtype support",
   "homepage": "https://github.com/kkpoon/generator-flowtype",
   "author": {
