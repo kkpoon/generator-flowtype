@@ -4,6 +4,9 @@ var chalk = require('chalk');
 var yosay = require('yosay');
 
 module.exports = yeoman.generators.Base.extend({
+  constructor: function () {
+    this.option('flow-bin');
+  },
   prompting: function () {
     var done = this.async();
 
@@ -16,7 +19,10 @@ module.exports = yeoman.generators.Base.extend({
       type: 'confirm',
       name: 'installFlowBin',
       message: 'Would you like to install flow-bin in your project devDependencies?',
-      default: true
+      default: true,
+      when: function () {
+        return !this.options["flow-bin"];
+      }
     }];
 
     this.prompt(prompts, function (props) {
@@ -25,17 +31,17 @@ module.exports = yeoman.generators.Base.extend({
     }.bind(this));
   },
   writing() {
-    const pkg = this.fs.readJSON(this.destinationPath('package.json'), {})
-    const scripts = Object.assign({}, pkg.scripts, {"flow": "flow check"});
+    const pkg = this.fs.readJSON(this.destinationPath('package.json'), {});
+    const scripts = Object.assign({}, pkg.scripts, {flow: "flow check"});
     const newPkg = Object.assign({}, pkg, {scripts: scripts});
-    this.fs.writeJSON(this.destinationPath('package.json'), newPkg)
+    this.fs.writeJSON(this.destinationPath('package.json'), newPkg);
   },
   install: function () {
     if (this.props.installFlowBin) {
-      this.npmInstall(['flow-bin'], { 'saveDev': true });
+      this.npmInstall(['flow-bin'], {saveDev: true});
     }
   },
-  end: function() {
+  end: function () {
     var done = this.async();
     if (this.props.installFlowBin) {
       this.spawnCommand("./node_modules/.bin/flow", ["init"], done);
