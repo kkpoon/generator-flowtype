@@ -5,7 +5,8 @@ var yosay = require('yosay');
 
 module.exports = yeoman.generators.Base.extend({
   constructor: function () {
-    this.option('flow-bin');
+    yeoman.generators.Base.apply(this, arguments);
+    this.option('flow-bin', {desc: "install flow-bin from npm"});
   },
   prompting: function () {
     var done = this.async();
@@ -22,7 +23,7 @@ module.exports = yeoman.generators.Base.extend({
       default: true,
       when: function () {
         return !this.options["flow-bin"];
-      }
+      }.bind(this)
     }];
 
     this.prompt(prompts, function (props) {
@@ -31,6 +32,10 @@ module.exports = yeoman.generators.Base.extend({
     }.bind(this));
   },
   writing() {
+    this.fs.copy(
+      this.templatePath('flowconfig'),
+      this.destinationPath('.flowconfig')
+    );
     const pkg = this.fs.readJSON(this.destinationPath('package.json'), {});
     const scripts = Object.assign({}, pkg.scripts, {flow: "flow check"});
     const newPkg = Object.assign({}, pkg, {scripts: scripts});
@@ -39,14 +44,6 @@ module.exports = yeoman.generators.Base.extend({
   install: function () {
     if (this.props.installFlowBin) {
       this.npmInstall(['flow-bin'], {saveDev: true});
-    }
-  },
-  end: function () {
-    var done = this.async();
-    if (this.props.installFlowBin) {
-      this.spawnCommand("./node_modules/.bin/flow", ["init"], done);
-    } else {
-      this.spawnCommand("flow", ["init"], done);
     }
   }
 });

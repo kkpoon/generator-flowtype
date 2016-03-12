@@ -15,4 +15,8 @@ describe('generator-flowtype:app', function () {
       '.flowconfig'
     ]);
   });
+
+  it('add `flow` command to npm scripts', function () {
+    assert.fileContent('package.json', '"flow": "flow check"');
+  });
 });
